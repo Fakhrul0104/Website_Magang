@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
 
 import Header from "./components/Header";
@@ -88,32 +87,6 @@ export default function App() {
     setNotice(
       "Tautan telah dihapus dari direktori",
     );
-=======
-import { useEffect, useState } from "react"
-
-import Footer from "@/components/Footer"
-import Header from "@/components/Header"
-import Toast from "@/components/Toast"
-import { useLinks } from "@/hooks/useLinks"
-import HomePage from "@/pages/HomePage"
-import ManagePage from "@/pages/ManagePage"
-import type { PageName } from "@/types"
-
-export default function App() {
-  const [page, setPage] = useState<PageName>("home")
-  const [notice, setNotice] = useState("")
-  const { links, addLink, removeLink } = useLinks()
-
-  useEffect(() => {
-    if (!notice) return
-    const timeout = window.setTimeout(() => setNotice(""), 2600)
-    return () => window.clearTimeout(timeout)
-  }, [notice])
-
-  function navigate(destination: PageName) {
-    setPage(destination)
-    window.scrollTo({ top: 0, behavior: "smooth" })
->>>>>>> 7c7bdb2cd134ad60808723de9375e7876f0cc2f8
   }
 
   return (
@@ -133,7 +106,6 @@ export default function App() {
       ) : (
         <ManagePage
           links={links}
-<<<<<<< HEAD
           onBack={() =>
             navigate("home")
           }
@@ -153,21 +125,3 @@ export default function App() {
     </div>
   );
 }
-=======
-          onBack={() => navigate("home")}
-          onAdd={(link) => {
-            addLink(link)
-            setNotice("Tautan baru berhasil ditambahkan")
-          }}
-          onDelete={(id) => {
-            removeLink(id)
-            setNotice("Tautan telah dihapus dari direktori")
-          }}
-        />
-      )}
-      <Toast message={notice} />
-      <Footer />
-    </div>
-  )
-}
->>>>>>> 7c7bdb2cd134ad60808723de9375e7876f0cc2f8
