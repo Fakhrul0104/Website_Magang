@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 import type { IconName, LinkItem } from "../types/link";
 
 export const categories = [
-    "Operasional",
-    "Navigasi & Cuaca",
-    "Administrasi",
+    "Pelayanan Kapal",
+    "Komersial",
+    "Keuangan",
+    "IT Cabang",
+    "Umum"
 ];
 
 export const initialLinks: LinkItem[] = [

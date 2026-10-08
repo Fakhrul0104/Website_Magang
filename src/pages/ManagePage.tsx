@@ -109,13 +109,6 @@ export default function ManagePage({
     return (
         <main className="manage-page">
             <div className="manage-intro">
-                <button
-                    className="back-button"
-                    onClick={onBack}
-                >
-                    ← &nbsp; Kembali ke beranda
-                </button>
-
                 <span className="section-kicker">
                     ADMINISTRASI PORTAL
                 </span>
