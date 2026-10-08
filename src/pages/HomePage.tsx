@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import Icon from "../components/Icon";
 import { categories } from "../data/links";
 import type { LinkItem } from "../types/link";
+import Pelabuhan from "../assets/dji.png";
 
 type HomePageProps = {
     links: LinkItem[];
@@ -33,8 +34,8 @@ export default function HomePage({
         <main>
             <section className="hero">
                 <img
-                    src="https://images.unsplash.com/photo-1582517339790-63168430ee86?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=85&w=1800"
-                    alt="Mercusuar putih di tepi laut saat matahari terbenam"
+                    src={Pelabuhan}
+                    alt="Pelabuhan telu bayur"
                 />
 
                 <div className="hero-overlay" />
@@ -57,6 +58,7 @@ export default function HomePage({
                         operasional, dan informasi maritim Pelindo.
                     </p>
 
+                    {/* Search bar */}
                     <label className="search-box">
                         <Icon name="compass" size={22} />
 
@@ -70,7 +72,6 @@ export default function HomePage({
                             aria-label="Cari layanan"
                         />
 
-                        <kbd>⌘ K</kbd>
                     </label>
                 </div>
 

@@ -157,12 +157,12 @@ nav button.active::after {
   left: clamp(24px, 9vw, 140px);
   top: 50%;
   transform: translateY(-50%);
-  max-width: 640px;
+  max-width: 620px;
 }
 
 .eyebrow {
   color: #bdeeff;
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: .3em;
   text-transform: uppercase;
   display: flex;
@@ -240,15 +240,15 @@ nav button.active::after {
   right: 32px;
   bottom: 28px;
   writing-mode: vertical-rl;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: .22em;
   color: rgba(255, 255, 255, .65);
 }
 
 .portal-section {
-  max-width: 1180px;
+  max-width: 1380px;
   margin: 0 auto;
-  padding: 76px 28px 96px;
+  padding: 50px 28px 96px;
 }
 
 .section-heading {
@@ -256,21 +256,21 @@ nav button.active::after {
   justify-content: space-between;
   align-items: end;
   padding-bottom: 32px;
-  border-bottom: 1px solid #d5e4eb;
+  border-bottom: 2px solid #d5e4eb;
 }
 
 .section-kicker {
-  font-size: 9px;
+  font-size: 14px;
   color: var(--brass);
-  letter-spacing: .28em;
+  letter-spacing: .25em;
   font-weight: 600;
 }
 
 .section-heading h2,
 .panel-title h2 {
-  font: 600 42px/1 "Cormorant Garamond", serif;
+  font: 600 65px/1 "Cormorant Garamond", serif;
   color: var(--navy);
-  margin: 10px 0 0;
+  margin: 5px 0 0;
 }
 
 .section-heading>p {
@@ -294,14 +294,14 @@ nav button.active::after {
 
 .category-title>span {
   color: var(--brass);
-  font: 600 12px "Inter";
+  font: 600 15px "Inter";
 }
 
 .category-title h3 {
   margin: 0;
   color: var(--navy);
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: .16em;
 }
 
@@ -313,7 +313,7 @@ nav button.active::after {
 
 .link-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 13px;
 }
 
@@ -356,8 +356,8 @@ nav button.active::after {
 .icon-frame,
 .item-icon {
   flex: 0 0 auto;
-  width: 52px;
-  height: 52px;
+  width: 57px;
+  height: 57px;
   border: 1px solid #b8ddec;
   display: grid;
   place-items: center;
@@ -386,14 +386,14 @@ nav button.active::after {
 
 .card-copy strong,
 .item-copy strong {
-  font: 600 18px "Cormorant Garamond", serif;
+  font: 600 20px "Cormorant Garamond", serif;
   color: var(--navy);
   display: block;
 }
 
 .card-copy small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   display: block;
   margin-top: 4px;
@@ -856,7 +856,7 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: .09em;
   text-transform: uppercase;
 }
@@ -879,7 +879,7 @@ footer .footer-brand img {
 footer p {
   font-family: "Cormorant Garamond", serif;
   text-transform: none;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0;
   font-style: italic;
 }
@@ -895,7 +895,7 @@ footer p {
 
   .section-heading {
     align-items: start;
-    gap: 25px;
+    gap: 20px;
   }
 
   .section-heading>p {
