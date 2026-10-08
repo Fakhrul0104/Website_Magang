@@ -212,35 +212,6 @@ export default function ManagePage({
                                     ))}
                                 </select>
                             </label>
-
-                            <label>
-                                <span>Ikon</span>
-
-                                <select
-                                    value={form.icon}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            icon: e.target
-                                                .value as IconName,
-                                        })
-                                    }
-                                >
-                                    {Object.keys(iconPaths).map(
-                                        (icon) => (
-                                            <option
-                                                value={icon}
-                                                key={icon}
-                                            >
-                                                {icon
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    icon.slice(1)}
-                                            </option>
-                                        ),
-                                    )}
-                                </select>
-                            </label>
                         </div>
 
                         <div className="image-field">
@@ -399,8 +370,8 @@ export default function ManagePage({
                                     title="Hapus tautan"
                                 >
                                     <svg
-                                        width="18"
-                                        height="18"
+                                        width="22"
+                                        height="22"
                                         viewBox="0 0 24 24"
                                         fill="none"
                                         stroke="currentColor"

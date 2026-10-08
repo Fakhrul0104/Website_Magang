@@ -72,9 +72,8 @@ export default function HomePage({ links, onManage }: HomePageProps) {
     <main>
       {/* Floating pill sticky bar */}
       <div
-        className={`search-sticky-wrap${
-          isSticky ? " search-sticky-wrap--visible" : ""
-        }`}
+        className={`search-sticky-wrap${isSticky ? " search-sticky-wrap--visible" : ""
+          }`}
       >
         <label className="search-pill">
           <Icon name="compass" size={18} />
@@ -122,9 +121,8 @@ export default function HomePage({ links, onManage }: HomePageProps) {
         {/* Anchor search di hero */}
         <div className="hero-search-anchor" ref={anchorRef}>
           <label
-            className={`search-pill hero-search${
-              isSticky ? " hero-search--lifting" : ""
-            }`}
+            className={`search-pill hero-search${isSticky ? " hero-search--lifting" : ""
+              }`}
           >
             <Icon name="compass" size={20} />
             <input
@@ -178,9 +176,8 @@ export default function HomePage({ links, onManage }: HomePageProps) {
                   key={link.id}
                 >
                   <span
-                    className={`icon-frame${
-                      link.image ? " has-image" : ""
-                    }`}
+                    className={`icon-frame${link.image ? " has-image" : ""
+                      }`}
                   >
                     <LinkVisual link={link} />
                   </span>
@@ -226,9 +223,8 @@ export default function HomePage({ links, onManage }: HomePageProps) {
                         key={link.id}
                       >
                         <span
-                          className={`icon-frame${
-                            link.image ? " has-image" : ""
-                          }`}
+                          className={`icon-frame${link.image ? " has-image" : ""
+                            }`}
                         >
                           <LinkVisual link={link} />
                         </span>
