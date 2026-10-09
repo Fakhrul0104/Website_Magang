@@ -85,15 +85,6 @@ export default function HomePage({ links, onManage }: HomePageProps) {
             placeholder="Cari layanan, portal, atau informasi..."
             aria-label="Cari layanan"
           />
-          {query && (
-            <button
-              className="search-pill-clear"
-              onClick={() => setQuery("")}
-              aria-label="Hapus pencarian"
-            >
-              ✕
-            </button>
-          )}
         </label>
       </div>
 
