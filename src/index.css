@@ -78,8 +78,8 @@ button {
 }
 
 .brand img {
-  width: 142px;
-  height: 54px;
+  width: 146px;
+  height: 56px;
   object-fit: contain;
   display: block;
 }
@@ -93,7 +93,7 @@ button {
 .brand small {
   display: block;
   color: #6b8999;
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.45;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -982,6 +982,15 @@ footer p {
   footer p {
     margin: 0;
   }
+}
+
+/* Mengubah warna icon compass (SVG/Font) menjadi hitam di semua search pill */
+.search-pill svg,
+.search-pill .icon,
+.search-pill i {
+  color: #000000;
+  stroke: currentColor;
+  /* Jika icon menggunakan SVG stroke */
 }
 
 /* Container Floating Sticky Bar */
