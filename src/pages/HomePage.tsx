@@ -229,7 +229,7 @@ export default function HomePage({ links, onManage }: HomePageProps) {
         {visibleLinks.length === 0 && (
           <div className="empty-state">
             <Icon name="compass" size={34} />
-            <h3>Tidak ada pelabuhan yang ditemukan</h3>
+            <h3>Tidak ada Tautan yang ditemukan</h3>
             <p>
               Coba gunakan kata kunci lain atau tambahkan tautan baru.
             </p>
