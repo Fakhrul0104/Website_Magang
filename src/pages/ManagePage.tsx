@@ -12,8 +12,8 @@ import type { IconName, LinkItem } from "../types/link";
 
 type ManagePageProps = {
     links: LinkItem[];
-    onAdd: (link: Omit<LinkItem, "id">) => void;
-    onDelete: (id: string) => void;
+    onAdd: (link: Omit<LinkItem, "id">) => Promise<void>;
+    onDelete: (id: string) => Promise<void>;
     onBack: () => void;
 };
 
@@ -77,34 +77,41 @@ export default function ManagePage({
         }
     }
 
-    function submit(event: FormEvent) {
+    async function submit(event: FormEvent) {
         event.preventDefault();
 
-        const safeUrl =
-            /^https?:\/\//i.test(form.url)
-                ? form.url
-                : `https://${form.url}`;
+        const safeUrl = /^https?:\/\//i.test(form.url.trim())
+            ? form.url.trim()
+            : `https://${form.url.trim()}`;
 
-        onAdd({
+        try {
+            await onAdd({
             ...form,
             url: safeUrl,
-        });
+            });
 
-        setForm({
+            setForm({
             title: "",
             url: "",
             description: "",
             category: categories[0],
             icon: "anchor",
             image: "",
-        });
+            });
 
-        setImageError("");
+            setImageError("");
 
-        if (fileInputRef.current) {
+            if (fileInputRef.current) {
             fileInputRef.current.value = "";
+            }
+        } catch (error) {
+            alert(
+            error instanceof Error
+                ? error.message
+                : "Tautan gagal disimpan."
+            );
         }
-    }
+        }
 
     return (
         <main className="manage-page">
@@ -359,26 +366,33 @@ export default function ManagePage({
                                             )
                                             .replace(/\/$/, "")}
                                     </small>
-                                </span>
-
+                                </span>                          
                                 <button
-                                    aria-label={`Hapus ${link.title}`}
-                                    className="delete-button"
-                                    onClick={() =>
-                                        onDelete(link.id)
+                                aria-label={`Hapus ${link.title}`}
+                                className="delete-button"
+                                onClick={async () => {
+                                    try {
+                                    await onDelete(link.id);
+                                    } catch (error) {
+                                    alert(
+                                        error instanceof Error
+                                        ? error.message
+                                        : "Tautan gagal dihapus."
+                                    );
                                     }
-                                    title="Hapus tautan"
+                                }}
+                                title="Hapus tautan"
                                 >
-                                    <svg
-                                        width="22"
-                                        height="22"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.7"
-                                    >
-                                        <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" />
-                                    </svg>
+                                <svg
+                                    width="22"
+                                    height="22"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.7"
+                                >
+                                    <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" />
+                                </svg>
                                 </button>
                             </div>
                         ))}

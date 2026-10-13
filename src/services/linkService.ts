@@ -1,63 +1,45 @@
-import { DEFAULT_LINKS } from "@/data/defaultLinks"
-import type { LinkInput, LinkItem, LinkUpdate } from "@/types"
 
-const STORAGE_KEY = "portal-samudra-links"
+import type { LinkInput, LinkItem } from "@/types";
 
-function persistLinks(links: LinkItem[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(links))
-}
+const API_URL = "http://localhost:3000/api/links";
 
-function normalizeUrl(url: string): string {
-  const trimmedUrl = url.trim()
-  return /^https?:\/\//i.test(trimmedUrl) ? trimmedUrl : `https://${trimmedUrl}`
-}
+async function request<T>(
+  path = "",
+  options: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
 
-function createId(): string {
-  return typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`
-}
-
-export function readLinks(): LinkItem[] {
-  try {
-    const savedLinks = localStorage.getItem(STORAGE_KEY)
-    if (!savedLinks) {
-      persistLinks(DEFAULT_LINKS)
-      return [...DEFAULT_LINKS]
-    }
-    return JSON.parse(savedLinks) as LinkItem[]
-  } catch {
-    return [...DEFAULT_LINKS]
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result.message || "Permintaan gagal");
   }
-}
 
-export function createLink(input: LinkInput): LinkItem {
-  const newLink: LinkItem = {
-    ...input,
-    id: createId(),
-    title: input.title.trim(),
-    description: input.description.trim(),
-    url: normalizeUrl(input.url),
+  if (response.status === 204) {
+    return undefined as T;
   }
-  persistLinks([...readLinks(), newLink])
-  return newLink
+
+  return response.json() as Promise<T>;
 }
 
-export function updateLink(id: string, update: LinkUpdate): LinkItem | null {
-  let updatedLink: LinkItem | null = null
-  const links = readLinks().map((link) => {
-    if (link.id !== id) return link
-    updatedLink = {
-      ...link,
-      ...update,
-      url: update.url ? normalizeUrl(update.url) : link.url,
-    }
-    return updatedLink
-  })
-  persistLinks(links)
-  return updatedLink
+export function readLinks(): Promise<LinkItem[]> {
+  return request<LinkItem[]>();
 }
 
-export function deleteLink(id: string): void {
-  persistLinks(readLinks().filter((link) => link.id !== id))
+export function createLink(input: LinkInput): Promise<LinkItem> {
+  return request<LinkItem>("", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function deleteLink(id: string): Promise<void> {
+  return request<void>(`/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
