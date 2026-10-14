@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import Icon from "../components/Icon";
-import { categories, iconPaths } from "../data/links";
+import { categories} from "../data/links";
 import { optimizeImage } from "../utils/image";
 import type { IconName, LinkItem } from "../types/link";
 
@@ -21,7 +21,7 @@ export default function ManagePage({
     links,
     onAdd,
     onDelete,
-    onBack,
+    
 }: ManagePageProps) {
     const [form, setForm] = useState({
         title: "",
