@@ -11,16 +11,20 @@ dotenv.config();
 const app = express();
 
 
-app.use(cors({
-  origin: [
-    "http://localhost:8443",
-    "https://localhost:8443",
-    "http://127.0.0.1:8443",
-    "https://127.0.0.1:8443"
-  ],
-  methods: ["GET", "POST", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+const allowedOrigins = [
+  "http://localhost:8443",
+  "http://127.0.0.1:8443",
+  "http://10.101.25.50:8443",
+  "http://10.101.26.108:8443",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -150,6 +154,6 @@ app.get("/api/health", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Backend berjalan di http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend berjalan di port ${PORT}`);
 });
