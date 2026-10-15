@@ -29,8 +29,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 
 const allowedIcons = [
-  "anchor", "ship", "compass", "map", "radio",
-  "cloud", "book", "users", "globe", "box",
+  "anchor", "ship", "compass",
 ];
 
 // Mengambil semua tautan aktif untuk halaman utama
