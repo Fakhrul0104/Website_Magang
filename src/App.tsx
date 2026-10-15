@@ -8,7 +8,7 @@ import type { LinkItem } from "./types/link";
 
 type Page = "home" | "manage";
 
-const API_URL = "http://localhost:3000/api/links";
+const API_URL = "http://10.101.25.50:3000/api/links";
 
 export default function App() {
   const [page, setPage] = useState<Page>("home");
