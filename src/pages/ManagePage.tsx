@@ -9,6 +9,7 @@ import Icon from "../components/Icon";
 import { categories } from "../data/links";
 import { optimizeImage } from "../utils/image";
 import type { IconName, LinkItem } from "../types/link";
+import Pelabuhan from "../assets/dji.png";
 
 type LinkForm = Omit<LinkItem, "id">;
 
@@ -163,7 +164,18 @@ export default function ManagePage({
 
     return (
         <main className="manage-page">
-            <div className="manage-intro">
+            <div
+                className="manage-intro"
+                style={{
+                    backgroundImage: `
+                        linear-gradient(
+                            rgba(8, 24, 35, 0.65),
+                            rgba(8, 24, 35, 0.75)
+                        ),
+                        url(${Pelabuhan})
+                    `,
+                }}
+            >
                 <span className="section-kicker">
                     ADMINISTRASI PORTAL
                 </span>
