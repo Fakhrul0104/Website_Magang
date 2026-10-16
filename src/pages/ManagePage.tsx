@@ -6,13 +6,16 @@ import {
 } from "react";
 
 import Icon from "../components/Icon";
-import { categories} from "../data/links";
+import { categories } from "../data/links";
 import { optimizeImage } from "../utils/image";
 import type { IconName, LinkItem } from "../types/link";
 
+type LinkForm = Omit<LinkItem, "id">;
+
 type ManagePageProps = {
     links: LinkItem[];
-    onAdd: (link: Omit<LinkItem, "id">) => Promise<void>;
+    onAdd: (link: LinkForm) => Promise<void>;
+    onUpdate: (id: string, link: LinkForm) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
     onBack: () => void;
 };
@@ -20,23 +23,28 @@ type ManagePageProps = {
 export default function ManagePage({
     links,
     onAdd,
+    onUpdate,
     onDelete,
-    
 }: ManagePageProps) {
-    const [form, setForm] = useState({
+    const initialForm: LinkForm = {
         title: "",
         url: "",
         description: "",
         category: categories[0],
         icon: "anchor" as IconName,
         image: "",
+    };
+
+    const [form, setForm] = useState<LinkForm>({
+        ...initialForm,
     });
 
-    const [imageError, setImageError] =
-        useState("");
+    const [imageError, setImageError] = useState("");
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [saving, setSaving] = useState(false);
 
-    const fileInputRef =
-        useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const formPanelRef = useRef<HTMLElement>(null);
 
     async function handleImage(
         event: ChangeEvent<HTMLInputElement>,
@@ -48,16 +56,14 @@ export default function ManagePage({
         }
 
         if (!file.type.startsWith("image/")) {
-            setImageError(
-                "File harus berupa gambar.",
-            );
+            setImageError("File harus berupa gambar.");
+            event.target.value = "";
             return;
         }
 
         if (file.size > 8 * 1024 * 1024) {
-            setImageError(
-                "Ukuran gambar maksimal 8 MB.",
-            );
+            setImageError("Ukuran gambar maksimal 8 MB.");
+            event.target.value = "";
             return;
         }
 
@@ -77,41 +83,83 @@ export default function ManagePage({
         }
     }
 
-    async function submit(event: FormEvent) {
+    function resetForm() {
+        setForm({ ...initialForm });
+        setEditingId(null);
+        setImageError("");
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }
+
+    function handleEdit(link: LinkItem) {
+        setForm({
+            title: link.title,
+            url: link.url,
+            description: link.description,
+            category: link.category,
+            icon: link.icon,
+            image: link.image ?? "",
+        });
+
+        setEditingId(link.id);
+        setImageError("");
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+
+        requestAnimationFrame(() => {
+            formPanelRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        });
+    }
+
+    async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const safeUrl = /^https?:\/\//i.test(form.url.trim())
-            ? form.url.trim()
-            : `https://${form.url.trim()}`;
+        if (saving) {
+            return;
+        }
+
+        const trimmedUrl = form.url.trim();
+
+        const safeUrl = /^https?:\/\//i.test(trimmedUrl)
+            ? trimmedUrl
+            : `https://${trimmedUrl}`;
+
+        const payload: LinkForm = {
+            ...form,
+            title: form.title.trim(),
+            url: safeUrl,
+            description: form.description.trim(),
+        };
+
+        setSaving(true);
 
         try {
-            await onAdd({
-            ...form,
-            url: safeUrl,
-            });
-
-            setForm({
-            title: "",
-            url: "",
-            description: "",
-            category: categories[0],
-            icon: "anchor",
-            image: "",
-            });
-
-            setImageError("");
-
-            if (fileInputRef.current) {
-            fileInputRef.current.value = "";
+            if (editingId !== null) {
+                await onUpdate(editingId, payload);
+            } else {
+                await onAdd(payload);
             }
+
+            resetForm();
         } catch (error) {
             alert(
-            error instanceof Error
-                ? error.message
-                : "Tautan gagal disimpan."
+                error instanceof Error
+                    ? error.message
+                    : editingId !== null
+                        ? "Tautan gagal diperbarui."
+                        : "Tautan gagal disimpan.",
             );
+        } finally {
+            setSaving(false);
         }
-        }
+    }
 
     return (
         <main className="manage-page">
@@ -132,17 +180,25 @@ export default function ManagePage({
             </div>
 
             <div className="manage-layout">
-                <section className="form-panel">
+                <section
+                    className="form-panel"
+                    ref={formPanelRef}
+                >
                     <div className="panel-number">
                         01
                     </div>
 
                     <div className="panel-title">
-                        <h2>Tambahkan Tautan</h2>
+                        <h2>
+                            {editingId !== null
+                                ? "Edit Tautan"
+                                : "Tambahkan Tautan"}
+                        </h2>
 
                         <p>
-                            Lengkapi informasi destinasi digital
-                            di bawah ini.
+                            {editingId !== null
+                                ? "Perbarui informasi destinasi digital di bawah ini."
+                                : "Lengkapi informasi destinasi digital di bawah ini."}
                         </p>
                     </div>
 
@@ -217,6 +273,14 @@ export default function ManagePage({
                                             {category}
                                         </option>
                                     ))}
+
+                                    {/* Mempertahankan kategori lama
+                                        jika tidak ada dalam daftar. */}
+                                    {!categories.includes(form.category) && (
+                                        <option value={form.category}>
+                                            {form.category}
+                                        </option>
+                                    )}
                                 </select>
                             </label>
                         </div>
@@ -253,11 +317,8 @@ export default function ManagePage({
                                                 image: "",
                                             });
 
-                                            if (
-                                                fileInputRef.current
-                                            ) {
-                                                fileInputRef.current.value =
-                                                    "";
+                                            if (fileInputRef.current) {
+                                                fileInputRef.current.value = "";
                                             }
                                         }}
                                     >
@@ -300,10 +361,29 @@ export default function ManagePage({
                         <button
                             className="primary-button"
                             type="submit"
+                            disabled={saving}
                         >
-                            Tambahkan ke direktori
-                            <span>＋</span>
+                            {saving
+                                ? "Menyimpan..."
+                                : editingId !== null
+                                    ? "Simpan Perubahan"
+                                    : "Tambahkan ke direktori"}
+
+                            <span>
+                                {editingId !== null ? "✓" : "＋"}
+                            </span>
                         </button>
+
+                        {editingId !== null && (
+                            <button
+                                className="primary-button"
+                                type="button"
+                                disabled={saving}
+                                onClick={resetForm}
+                            >
+                                Batal Edit
+                            </button>
+                        )}
                     </form>
                 </section>
 
@@ -330,14 +410,19 @@ export default function ManagePage({
                     <div className="manage-list">
                         {links.map((link) => (
                             <div
-                                className="manage-item"
+                                className={`manage-item${
+                                    editingId === link.id
+                                        ? " is-editing"
+                                        : ""
+                                }`}
                                 key={link.id}
                             >
                                 <span
-                                    className={`item-icon${link.image
-                                        ? " has-image"
-                                        : ""
-                                        }`}
+                                    className={`item-icon${
+                                        link.image
+                                            ? " has-image"
+                                            : ""
+                                    }`}
                                 >
                                     {link.image ? (
                                         <img
@@ -366,33 +451,61 @@ export default function ManagePage({
                                             )
                                             .replace(/\/$/, "")}
                                     </small>
-                                </span>                          
+                                </span>
+
                                 <button
-                                aria-label={`Hapus ${link.title}`}
-                                className="delete-button"
-                                onClick={async () => {
-                                    try {
-                                    await onDelete(link.id);
-                                    } catch (error) {
-                                    alert(
-                                        error instanceof Error
-                                        ? error.message
-                                        : "Tautan gagal dihapus."
-                                    );
-                                    }
-                                }}
-                                title="Hapus tautan"
+                                    type="button"
+                                    aria-label={`Edit ${link.title}`}
+                                    className="edit-button"
+                                    onClick={() => handleEdit(link)}
+                                    disabled={saving}
+                                    title="Edit tautan"
                                 >
-                                <svg
-                                    width="22"
-                                    height="22"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.7"
+                                    <svg
+                                        width="22"
+                                        height="22"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                    >
+                                        <path d="M12 20h9" />
+                                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    aria-label={`Hapus ${link.title}`}
+                                    className="delete-button"
+                                    onClick={async () => {
+                                        try {
+                                            await onDelete(link.id);
+
+                                            if (editingId === link.id) {
+                                                resetForm();
+                                            }
+                                        } catch (error) {
+                                            alert(
+                                                error instanceof Error
+                                                    ? error.message
+                                                    : "Tautan gagal dihapus.",
+                                            );
+                                        }
+                                    }}
+                                    title="Hapus tautan"
+                                    disabled={saving}
                                 >
-                                    <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" />
-                                </svg>
+                                    <svg
+                                        width="22"
+                                        height="22"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                    >
+                                        <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" />
+                                    </svg>
                                 </button>
                             </div>
                         ))}

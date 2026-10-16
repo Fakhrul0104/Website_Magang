@@ -21,7 +21,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST","PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
@@ -155,4 +155,116 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend berjalan di port ${PORT}`);
+});
+
+/* Memperbarui tautan berdasarkan ID */
+app.put("/api/links/:id", async (req, res) => {
+  const { title, description, url, category, icon, image } = req.body;
+  const id = req.params.id;
+
+  if (
+    typeof title !== "string" ||
+    !title.trim() ||
+    typeof url !== "string" ||
+    !url.trim() ||
+    typeof category !== "string" ||
+    !category.trim() ||
+    !allowedIcons.includes(icon)
+  ) {
+    return res.status(400).json({
+      message: "Data tautan tidak valid. Periksa nama, URL, kategori, dan ikon.",
+    });
+  }
+
+  const normalizedUrl = /^https?:\/\//i.test(url.trim())
+    ? url.trim()
+    : `https://${url.trim()}`;
+
+  let connection;
+
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    // Pastikan tautan yang akan diedit memang ada.
+    const [existing] = await connection.execute(
+      "SELECT id FROM links WHERE id = ?",
+      [id]
+    );
+
+    if (existing.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        message: "Tautan tidak ditemukan di database.",
+      });
+    }
+
+    // Buat kategori jika belum tersedia.
+    await connection.execute(
+      "INSERT IGNORE INTO categories (name) VALUES (?)",
+      [category.trim()]
+    );
+
+    const [categoriesFound] = await connection.execute(
+      "SELECT id FROM categories WHERE name = ?",
+      [category.trim()]
+    );
+
+    if (categoriesFound.length === 0) {
+      throw new Error("Kategori tidak ditemukan.");
+    }
+
+    const categoryId = categoriesFound[0].id;
+
+    // Perbarui data tautan di MySQL.
+    await connection.execute(
+      `UPDATE links
+       SET category_id = ?,
+           title = ?,
+           description = ?,
+           url = ?,
+           icon = ?,
+           image = ?
+       WHERE id = ?`,
+      [
+        categoryId,
+        title.trim(),
+        typeof description === "string" ? description.trim() : "",
+        normalizedUrl,
+        icon,
+        image || null,
+        id,
+      ]
+    );
+
+    await connection.commit();
+
+    return res.json({
+      id,
+      title: title.trim(),
+      description:
+        typeof description === "string" ? description.trim() : "",
+      url: normalizedUrl,
+      category: category.trim(),
+      icon,
+      image: image || null,
+    });
+  } catch (error) {
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error("Gagal membatalkan transaksi:", rollbackError);
+      }
+    }
+
+    console.error("Gagal memperbarui tautan:", error);
+
+    return res.status(500).json({
+      message: "Gagal memperbarui tautan di database.",
+    });
+  } finally {
+    connection?.release();
+  }
 });

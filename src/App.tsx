@@ -77,6 +77,68 @@ export default function App() {
     setNotice("Tautan baru berhasil ditambahkan.");
   }
 
+  async function updateLink(
+    id: string,
+    link: Omit<LinkItem, "id">
+  ): Promise<void> {
+    console.log("Mulai memperbarui tautan:", id, link);
+
+    let response: Response;
+
+    try {
+      response = await fetch(
+        `${API_URL}/${encodeURIComponent(id)}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(link),
+        }
+      );
+    } catch (error) {
+      console.error("Permintaan PUT gagal:", error);
+      throw new Error(
+        "Backend tidak dapat dijangkau. Periksa koneksi dan CORS."
+      );
+    }
+
+    const result = await response.json().catch(() => null);
+
+    console.log("Respons PUT:", response.status, result);
+
+    if (!response.ok) {
+      throw new Error(
+        result?.message ||
+        `Gagal memperbarui tautan. HTTP ${response.status}`
+      );
+    }
+
+    let refreshed: Response;
+
+    try {
+      refreshed = await fetch(API_URL);
+    } catch (error) {
+      console.error("Gagal memuat ulang data:", error);
+      throw new Error(
+        "Perubahan mungkin sudah tersimpan, tetapi data gagal dimuat ulang."
+      );
+    }
+
+    if (!refreshed.ok) {
+      throw new Error(
+        `Data gagal dimuat ulang. HTTP ${refreshed.status}`
+      );
+    }
+
+    const data: LinkItem[] = await refreshed.json();
+
+    setLinks(data);
+    setNotice("Tautan berhasil diperbarui.");
+
+    console.log("Tautan berhasil diperbarui.");
+  }
+
   async function deleteLink(id: string): Promise<void> {
     const response = await fetch(
       `${API_URL}/${encodeURIComponent(id)}`,
@@ -110,6 +172,7 @@ export default function App() {
           links={links}
           onBack={() => navigate("home")}
           onAdd={addLink}
+          onUpdate={updateLink}
           onDelete={deleteLink}
         />
       )}

@@ -49,6 +49,29 @@ button {
   cursor: pointer;
 }
 
+/* Tombol edit pada daftar tautan */
+.edit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.edit-button:hover {
+    opacity: 0.75;
+}
+
+.edit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .app-shell {
   min-height: 100vh;
 }
@@ -358,11 +381,11 @@ nav button.active::after {
   flex: 0 0 auto;
   width: 57px;
   height: 57px;
-  border: 1px solid #b8ddec;
   display: grid;
   place-items: center;
   color: var(--navy);
   background: #eef8fc;
+  box-sizing: border-box;
 }
 
 .icon-frame.has-image,
@@ -373,9 +396,10 @@ nav button.active::after {
 
 .icon-frame.has-image img,
 .item-icon.has-image img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .card-copy {
