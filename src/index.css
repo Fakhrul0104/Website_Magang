@@ -51,25 +51,25 @@ button {
 
 /* Tombol edit pada daftar tautan */
 .edit-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border: 1px solid currentColor;
-    border-radius: 8px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .edit-button:hover {
-    opacity: 0.75;
+  opacity: 0.75;
 }
 
 .edit-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .app-shell {
@@ -410,7 +410,7 @@ nav button.active::after {
 
 .card-copy strong,
 .item-copy strong {
-  font: 600 20px "Cormorant Garamond", serif;
+  font: 600 18px "Cormorant Garamond", serif;
   color: var(--navy);
   display: block;
 }
@@ -496,25 +496,25 @@ nav button.active::after {
 }
 
 .manage-intro {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 64px 40px;
-    min-height: 240px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #ffffff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 64px 40px;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #ffffff;
 }
 
 .manage-intro h1,
 .manage-intro p,
 .manage-intro .section-kicker {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 .manage-intro h1 em {
-    color: inherit;
+  color: inherit;
 }
 
 .back-button:hover {
@@ -542,6 +542,12 @@ nav button.active::after {
   grid-template-columns: .9fr 1.1fr;
   gap: 20px;
   align-items: start;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .form-panel,
@@ -551,6 +557,10 @@ nav button.active::after {
   padding: 34px;
   box-shadow: 0 18px 45px rgba(4, 83, 128, .1);
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .panel-number {
@@ -785,6 +795,9 @@ form input::placeholder {
   max-height: 536px;
   overflow-y: auto;
   padding-right: 5px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .manage-list::-webkit-scrollbar {
@@ -801,6 +814,9 @@ form input::placeholder {
   gap: 13px;
   padding: 13px 4px;
   border-bottom: 1px solid #ebe6db;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .item-icon {
@@ -811,10 +827,13 @@ form input::placeholder {
 .item-copy {
   min-width: 0;
   flex: 1;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .item-copy strong {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .item-copy small {
@@ -908,6 +927,16 @@ footer p {
 
   .manage-layout {
     grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .form-panel,
+  .list-panel {
+    min-width: 0;
+    padding: 28px 24px;
   }
 
   .section-heading {
@@ -1012,6 +1041,88 @@ footer p {
     margin: 0;
   }
 }
+
+/* Mencegah input melewati batas panel */
+.form-panel form,
+.form-panel label {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.form-panel input,
+.form-panel select,
+.form-panel textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.item-copy strong,
+.item-copy small {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 580px) {
+  .manage-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .form-panel,
+  .list-panel {
+    padding: 24px 16px;
+    border-radius: 14px;
+  }
+
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-panel input,
+  .form-panel select {
+    font-size: 16px;
+  }
+
+  .list-heading {
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .manage-item {
+    gap: 8px;
+  }
+
+  .item-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .edit-button,
+  .delete-button {
+    flex-shrink: 0;
+  }
+
+  .image-preview {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .image-preview>div {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .primary-button {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 
 /* Mengubah warna icon compass (SVG/Font) menjadi hitam di semua search pill */
 .search-pill svg,
