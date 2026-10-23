@@ -1,10 +1,12 @@
 
 import {
   memo,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type ChangeEvent,
 } from "react";
 
 import Icon from "../components/Icon";
@@ -22,8 +24,45 @@ type LinkCardProps = {
   showCategory: boolean;
 };
 
-// Pisahkan kartu agar perubahan state pencarian tidak
-// memaksa kartu yang propertinya tetap berubah untuk dirender ulang.
+type SearchInputProps = {
+  value: string;
+  sticky?: boolean;
+  onChange: (value: string) => void;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+};
+
+const HEADER_HEIGHT = 82;
+const STICKY_TRIGGER_OFFSET = 10;
+const SCROLL_MARGIN_TOP = 50;
+
+// Input pencarian digunakan pada hero dan sticky bar.
+const SearchInput = memo(function SearchInput({
+  value,
+  sticky = false,
+  onChange,
+  inputRef,
+}: SearchInputProps) {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value);
+  };
+
+  return (
+    <label className="search-pill">
+      <Icon name="compass" size={sticky ? 18 : 20} />
+
+      <input
+        ref={inputRef}
+        type="search"
+        value={value}
+        onChange={handleChange}
+        placeholder="Cari layanan, portal, atau informasi..."
+        aria-label="Cari layanan"
+      />
+    </label>
+  );
+});
+
+// Kartu tidak perlu dirender ulang jika props tidak berubah.
 const LinkCard = memo(function LinkCard({
   link,
   showCategory,
@@ -67,12 +106,18 @@ export default function HomePage({
   const [isSticky, setIsSticky] = useState(false);
 
   const anchorRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
+  const stickyInputRef = useRef<HTMLInputElement>(null);
+  const wasSearchingRef = useRef(false);
 
-  // Normalisasi query hanya sekali untuk setiap perubahan query.
   const normalizedQuery = query.trim().toLowerCase();
   const isSearching = normalizedQuery.length > 0;
 
-  // Filter daftar tautan.
+  const handleSearchChange = useCallback((value: string) => {
+    setQuery(value);
+  }, []);
+
+  // Filter tautan berdasarkan judul, deskripsi, dan kategori.
   const visibleLinks = useMemo(() => {
     if (!normalizedQuery) {
       return links;
@@ -85,54 +130,48 @@ export default function HomePage({
     );
   }, [links, normalizedQuery]);
 
-  // Kelompokkan kategori hanya ketika data tautan berubah.
-  // Urutan kategori mengikuti urutan pertama pada data.
+  // Pengelompokan hanya digunakan saat pencarian kosong.
   const groupedLinks = useMemo(() => {
+    if (isSearching) {
+      return [];
+    }
+
     const groups = new Map<string, LinkItem[]>();
 
-    for (const link of visibleLinks) {
-      const category = link.category;
-      const existing = groups.get(category);
+    for (const link of links) {
+      const existing = groups.get(link.category);
 
       if (existing) {
         existing.push(link);
       } else {
-        groups.set(category, [link]);
+        groups.set(link.category, [link]);
       }
     }
 
     return Array.from(groups.entries());
-  }, [visibleLinks]);
+  }, [links, isSearching]);
 
-  // Sticky search bar: batasi pemeriksaan scroll
-  // maksimal satu kali dalam satu frame browser.
+  // Mengatur kemunculan sticky search bar.
   useEffect(() => {
-    const HEADER_HEIGHT = 82;
-    const TRIGGER_OFFSET = 10;
-
     let frameId = 0;
 
     const updateSticky = () => {
       frameId = 0;
 
       const anchor = anchorRef.current;
-
       if (!anchor) return;
 
       const shouldBeSticky =
         anchor.getBoundingClientRect().top <
-        HEADER_HEIGHT - TRIGGER_OFFSET;
+        HEADER_HEIGHT - STICKY_TRIGGER_OFFSET;
 
       setIsSticky((previous) =>
-        previous === shouldBeSticky
-          ? previous
-          : shouldBeSticky,
+        previous === shouldBeSticky ? previous : shouldBeSticky,
       );
     };
 
     const handleScroll = () => {
       if (frameId !== 0) return;
-
       frameId = window.requestAnimationFrame(updateSticky);
     };
 
@@ -141,7 +180,6 @@ export default function HomePage({
     window.addEventListener("scroll", handleScroll, {
       passive: true,
     });
-
     window.addEventListener("resize", handleScroll);
 
     return () => {
@@ -154,32 +192,40 @@ export default function HomePage({
     };
   }, []);
 
-  const handleSearchChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setQuery(event.target.value);
-  };
+  // Scroll menuju judul direktori hanya saat pencarian mulai aktif.
+  useEffect(() => {
+    const hasStartedSearching =
+      isSearching && !wasSearchingRef.current;
+
+    wasSearchingRef.current = isSearching;
+
+    if (!hasStartedSearching) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      headingRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [isSearching]);
 
   return (
     <main>
       {/* Sticky search bar */}
       <div
-        className={`search-sticky-wrap${isSticky ? " search-sticky-wrap--visible" : ""
-          }`}
+        className={`search-sticky-wrap${
+          isSticky ? " search-sticky-wrap--visible" : ""
+        }`}
         aria-hidden={!isSticky}
       >
-        <label className="search-pill">
-          <Icon name="compass" size={18} />
-
-          <input
-            type="search"
-            value={query}
-            onChange={handleSearchChange}
-            placeholder="Cari layanan, portal, atau informasi..."
-            aria-label="Cari layanan"
-            tabIndex={isSticky ? 0 : -1}
-          />
-        </label>
+        <SearchInput
+          value={query}
+          sticky
+          onChange={handleSearchChange}
+          inputRef={stickyInputRef}
+        />
       </div>
 
       {/* Hero */}
@@ -213,23 +259,18 @@ export default function HomePage({
           </p>
         </div>
 
-        {/* Search utama */}
+        {/* Pencarian utama */}
         <div className="hero-search-anchor" ref={anchorRef}>
-          <label
-            className={`search-pill hero-search${isSticky ? " hero-search--lifting" : ""
-              }`}
+          <div
+            className={`hero-search${
+              isSticky ? " hero-search--lifting" : ""
+            }`}
           >
-            <Icon name="compass" size={20} />
-
-            <input
-              type="search"
+            <SearchInput
               value={query}
               onChange={handleSearchChange}
-              placeholder="Cari layanan, portal, atau informasi..."
-              aria-label="Cari layanan"
-              tabIndex={isSticky ? -1 : 0}
             />
-          </label>
+          </div>
         </div>
 
         <div className="coordinates">
@@ -239,7 +280,11 @@ export default function HomePage({
 
       {/* Daftar portal */}
       <section className="portal-section">
-        <div className="section-heading">
+        <div
+          className="section-heading"
+          ref={headingRef}
+          style={{ scrollMarginTop: `${SCROLL_MARGIN_TOP}px` }}
+        >
           <div>
             <span className="section-kicker">
               {isSearching
@@ -297,7 +342,7 @@ export default function HomePage({
           ))}
 
         {/* Hasil kosong */}
-        {visibleLinks.length === 0 && (
+        {isSearching && visibleLinks.length === 0 && (
           <div className="empty-state">
             <Icon name="compass" size={34} />
 
