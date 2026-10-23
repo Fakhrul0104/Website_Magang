@@ -1,100 +1,204 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+
+import {
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import Icon from "../components/Icon";
 import LinkVisual from "../components/LinkVisual";
 import type { LinkItem } from "../types/link";
-import Pelabuhan from "../assets/dji.png";
+import Pelabuhan from "../assets/dji.webp";
 
 type HomePageProps = {
   links: LinkItem[];
   onManage: () => void;
 };
 
-export default function HomePage({ links, onManage }: HomePageProps) {
+type LinkCardProps = {
+  link: LinkItem;
+  showCategory: boolean;
+};
+
+// Pisahkan kartu agar perubahan state pencarian tidak
+// memaksa kartu yang propertinya tetap berubah untuk dirender ulang.
+const LinkCard = memo(function LinkCard({
+  link,
+  showCategory,
+}: LinkCardProps) {
+  return (
+    <a
+      className="link-card"
+      href={link.url}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span
+        className={`icon-frame${link.image ? " has-image" : ""}`}
+      >
+        <LinkVisual link={link} />
+      </span>
+
+      <span className="card-copy">
+        <strong>{link.title}</strong>
+        <small>{link.description}</small>
+
+        {showCategory && (
+          <span className="category-badge">
+            {link.category}
+          </span>
+        )}
+      </span>
+
+      <span className="card-arrow" aria-hidden="true">
+        ↗
+      </span>
+    </a>
+  );
+});
+
+export default function HomePage({
+  links,
+  onManage,
+}: HomePageProps) {
   const [query, setQuery] = useState("");
   const [isSticky, setIsSticky] = useState(false);
 
-  const resultsRef = useRef<HTMLElement>(null);
   const anchorRef = useRef<HTMLDivElement>(null);
-  const floatingInputRef = useRef<HTMLInputElement>(null);
 
+  // Normalisasi query hanya sekali untuk setiap perubahan query.
+  const normalizedQuery = query.trim().toLowerCase();
+  const isSearching = normalizedQuery.length > 0;
+
+  // Filter daftar tautan.
   const visibleLinks = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return links;
+    if (!normalizedQuery) {
+      return links;
+    }
+
     return links.filter((link) =>
       `${link.title} ${link.description} ${link.category}`
         .toLowerCase()
-        .includes(normalized),
+        .includes(normalizedQuery),
     );
-  }, [links, query]);
+  }, [links, normalizedQuery]);
 
-  // Cek apakah pencarian sedang aktif
-  const isSearching = query.trim().length > 0;
+  // Kelompokkan kategori hanya ketika data tautan berubah.
+  // Urutan kategori mengikuti urutan pertama pada data.
+  const groupedLinks = useMemo(() => {
+    const groups = new Map<string, LinkItem[]>();
 
-  // Auto-scroll ke hasil saat mengetik
-  useEffect(() => {
-    if (!query.trim()) return;
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [query]);
+    for (const link of visibleLinks) {
+      const category = link.category;
+      const existing = groups.get(category);
 
-  // Scroll listener untuk transisi sticky bar dengan performa tinggi
-  useEffect(() => {
-    const HEADER_H = 82;
-    const TRIGGER_OFFSET = 10;
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (anchorRef.current) {
-            const rect = anchorRef.current.getBoundingClientRect();
-            setIsSticky(rect.top < HEADER_H - TRIGGER_OFFSET);
-          }
-          ticking = false;
-        });
-        ticking = true;
+      if (existing) {
+        existing.push(link);
+      } else {
+        groups.set(category, [link]);
       }
+    }
+
+    return Array.from(groups.entries());
+  }, [visibleLinks]);
+
+  // Sticky search bar: batasi pemeriksaan scroll
+  // maksimal satu kali dalam satu frame browser.
+  useEffect(() => {
+    const HEADER_HEIGHT = 82;
+    const TRIGGER_OFFSET = 10;
+
+    let frameId = 0;
+
+    const updateSticky = () => {
+      frameId = 0;
+
+      const anchor = anchorRef.current;
+
+      if (!anchor) return;
+
+      const shouldBeSticky =
+        anchor.getBoundingClientRect().top <
+        HEADER_HEIGHT - TRIGGER_OFFSET;
+
+      setIsSticky((previous) =>
+        previous === shouldBeSticky
+          ? previous
+          : shouldBeSticky,
+      );
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      if (frameId !== 0) return;
+
+      frameId = window.requestAnimationFrame(updateSticky);
+    };
+
+    updateSticky();
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+
+      if (frameId !== 0) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, []);
 
-  // Fokus floating input saat muncul
-  useEffect(() => {
-    if (isSticky && query) {
-      floatingInputRef.current?.focus();
-    }
-  }, [isSticky, query]);
+  const handleSearchChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setQuery(event.target.value);
+  };
 
   return (
     <main>
-      {/* Floating pill sticky bar */}
+      {/* Sticky search bar */}
       <div
         className={`search-sticky-wrap${isSticky ? " search-sticky-wrap--visible" : ""
           }`}
+        aria-hidden={!isSticky}
       >
         <label className="search-pill">
           <Icon name="compass" size={18} />
+
           <input
-            ref={floatingInputRef}
             type="search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Cari layanan, portal, atau informasi..."
             aria-label="Cari layanan"
+            tabIndex={isSticky ? 0 : -1}
           />
         </label>
       </div>
 
+      {/* Hero */}
       <section className="hero">
-        <img src={Pelabuhan} alt="Pelabuhan Teluk Bayur" />
+        <img
+          src={Pelabuhan}
+          alt="Pelabuhan Teluk Bayur"
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+        />
+
         <div className="hero-overlay" />
 
         <div className="hero-content">
           <div className="eyebrow">
-            <span /> Pusat Akses Pelabuhan <span />
+            <span />
+            Pusat Akses Pelabuhan
+            <span />
           </div>
 
           <h1>
@@ -104,24 +208,26 @@ export default function HomePage({ links, onManage }: HomePageProps) {
           </h1>
 
           <p>
-            Satu akses terpadu untuk layanan, operasional, dan informasi maritim
-            Pelindo.
+            Satu akses terpadu untuk layanan, operasional,
+            dan informasi maritim Pelindo.
           </p>
         </div>
 
-        {/* Anchor search di hero */}
+        {/* Search utama */}
         <div className="hero-search-anchor" ref={anchorRef}>
           <label
             className={`search-pill hero-search${isSticky ? " hero-search--lifting" : ""
               }`}
           >
             <Icon name="compass" size={20} />
+
             <input
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={handleSearchChange}
               placeholder="Cari layanan, portal, atau informasi..."
               aria-label="Cari layanan"
+              tabIndex={isSticky ? -1 : 0}
             />
           </label>
         </div>
@@ -131,12 +237,16 @@ export default function HomePage({ links, onManage }: HomePageProps) {
         </div>
       </section>
 
-      <section className="portal-section" ref={resultsRef}>
+      {/* Daftar portal */}
+      <section className="portal-section">
         <div className="section-heading">
           <div>
             <span className="section-kicker">
-              {isSearching ? "HASIL PENCARIAN" : "DIREKTORI DIGITAL"}
+              {isSearching
+                ? "HASIL PENCARIAN"
+                : "DIREKTORI DIGITAL"}
             </span>
+
             <h2>
               {isSearching
                 ? `Menampilkan ${visibleLinks.length} Hasil`
@@ -145,103 +255,73 @@ export default function HomePage({ links, onManage }: HomePageProps) {
           </div>
         </div>
 
-        {/* MODE 1: Saat Mencari (Tampilan Flat List terlepas dari kategori) */}
+        {/* Hasil pencarian */}
         {isSearching && visibleLinks.length > 0 && (
           <div className="search-results-block">
             <div className="link-grid">
               {visibleLinks.map((link) => (
-                <a
-                  className="link-card"
-                  href={link.url}
-                  target="_blank"
-                  rel="noreferrer"
+                <LinkCard
                   key={link.id}
-                >
-                  <span
-                    className={`icon-frame${link.image ? " has-image" : ""
-                      }`}
-                  >
-                    <LinkVisual link={link} />
-                  </span>
-
-                  <span className="card-copy">
-                    <strong>{link.title}</strong>
-                    <small>{link.description}</small>
-                    <span className="category-badge">{link.category}</span>
-                  </span>
-
-                  <span className="card-arrow">↗</span>
-                </a>
+                  link={link}
+                  showCategory
+                />
               ))}
             </div>
           </div>
         )}
 
-        {/* MODE 2: Saat Default (Dikelompokkan per Kategori) */}
+        {/* Daftar kategori */}
         {!isSearching &&
-          Array.from(new Set(visibleLinks.map((l) => l.category))).map(
-            (category, index) => {
-              const categoryLinks = visibleLinks.filter(
-                (link) => link.category === category,
-              );
+          groupedLinks.map(([category, categoryLinks], index) => (
+            <div className="category-block" key={category}>
+              <div className="category-title">
+                <span>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-              if (categoryLinks.length === 0) return null;
+                <h3>{category}</h3>
 
-              return (
-                <div className="category-block" key={category}>
-                  <div className="category-title">
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <h3>{category}</h3>
-                    <div />
-                  </div>
+                <div />
+              </div>
 
-                  <div className="link-grid">
-                    {categoryLinks.map((link) => (
-                      <a
-                        className="link-card"
-                        href={link.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        key={link.id}
-                      >
-                        <span
-                          className={`icon-frame${link.image ? " has-image" : ""
-                            }`}
-                        >
-                          <LinkVisual link={link} />
-                        </span>
+              <div className="link-grid">
+                {categoryLinks.map((link) => (
+                  <LinkCard
+                    key={link.id}
+                    link={link}
+                    showCategory={false}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
 
-                        <span className="card-copy">
-                          <strong>{link.title}</strong>
-                          <small>{link.description}</small>
-                        </span>
-
-                        <span className="card-arrow">↗</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              );
-            },
-          )}
-
-        {/* State saat tidak ada data yang cocok */}
+        {/* Hasil kosong */}
         {visibleLinks.length === 0 && (
           <div className="empty-state">
             <Icon name="compass" size={34} />
-            <h3>Tidak ada Tautan yang ditemukan</h3>
+
+            <h3>Tidak ada tautan yang ditemukan</h3>
+
             <p>
-              Coba gunakan kata kunci lain atau tambahkan tautan baru.
+              Coba gunakan kata kunci lain atau tambahkan
+              tautan baru.
             </p>
           </div>
         )}
 
-        <button className="manage-cta" onClick={onManage}>
+        <button
+          className="manage-cta"
+          onClick={onManage}
+          type="button"
+        >
           <span>
             <Icon name="anchor" size={22} />
           </span>
+
           Kelola direktori tautan
-          <b>→</b>
+
+          <b aria-hidden="true">→</b>
         </button>
       </section>
     </main>

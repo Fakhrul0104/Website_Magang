@@ -9,7 +9,7 @@ import Icon from "../components/Icon";
 import { categories } from "../data/links";
 import { optimizeImage } from "../utils/image";
 import type { IconName, LinkItem } from "../types/link";
-import Pelabuhan from "../assets/dji.png";
+import Pelabuhan from "../assets/dji.webp";
 
 type LinkForm = Omit<LinkItem, "id">;
 
@@ -422,19 +422,17 @@ export default function ManagePage({
                     <div className="manage-list">
                         {links.map((link) => (
                             <div
-                                className={`manage-item${
-                                    editingId === link.id
+                                className={`manage-item${editingId === link.id
                                         ? " is-editing"
                                         : ""
-                                }`}
+                                    }`}
                                 key={link.id}
                             >
                                 <span
-                                    className={`item-icon${
-                                        link.image
+                                    className={`item-icon${link.image
                                             ? " has-image"
                                             : ""
-                                    }`}
+                                        }`}
                                 >
                                     {link.image ? (
                                         <img

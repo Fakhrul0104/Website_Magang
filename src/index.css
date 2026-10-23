@@ -306,6 +306,8 @@ nav button.active::after {
 
 .category-block {
   margin-top: 42px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
 }
 
 .category-title {
@@ -1139,7 +1141,7 @@ footer p {
   top: 16px;
   /* Posisi di atas layar (melayang di atas header) */
   left: 50%;
-  transform: translateX(-50%) translateY(-100px) scale(0.95);
+  transform: translateX(-50%) translateY(-10px) scale(0.29);
   z-index: 999;
   /* Dipastikan paling atas melebihi z-index header (biasanya z-index: 10/100) */
   opacity: 0;
@@ -1148,16 +1150,22 @@ footer p {
   max-width: 600px;
   /* Transisi diperhalus dengan cubic-bezier khusus */
   transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.35s ease,
-    box-shadow 0.4s ease;
-  will-change: transform, opacity;
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 180ms;
 }
 
 .search-sticky-wrap--visible {
   transform: translateX(-50%) translateY(0) scale(1);
   opacity: 1;
   pointer-events: auto;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-sticky-wrap {
+    transition: none;
+  }
 }
 
 /* Style Komponen Search Pill */

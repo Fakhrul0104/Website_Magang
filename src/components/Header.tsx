@@ -1,4 +1,4 @@
-import pelindoLogo from "../assets/pelindo-logo.png";
+import pelindoLogo from "../assets/pelindo-logo.webp";
 
 type Page = "home" | "manage";
 
