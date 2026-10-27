@@ -29,4 +29,10 @@ export const iconPaths: Record<IconName, ReactNode> = {
             <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
         </>
     ),
+    "file-spreadsheet": (
+    <>
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 9h18M3 14h18M9 4v16M15 4v16" />
+    </>
+    ),
 };

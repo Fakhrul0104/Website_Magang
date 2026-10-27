@@ -2,6 +2,7 @@ export type IconName =
     | "anchor"
     | "ship"
     | "compass"
+    | "file-spreadsheet"
     ;
 
 export type LinkItem = {

@@ -1135,31 +1135,31 @@ footer p {
   /* Jika icon menggunakan SVG stroke */
 }
 
-/* Container Floating Sticky Bar */
 .search-sticky-wrap {
   position: fixed;
   top: 16px;
-  /* Posisi di atas layar (melayang di atas header) */
   left: 50%;
-  transform: translateX(-50%) translateY(-10px) scale(0.29);
+  transform: translateX(-50%) translateY(-24px) scale(0.97);
   z-index: 999;
-  /* Dipastikan paling atas melebihi z-index header (biasanya z-index: 10/100) */
+
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+
   width: calc(100% - 32px);
   max-width: 600px;
-  /* Transisi diperhalus dengan cubic-bezier khusus */
+
   transition:
-    opacity 180ms ease,
-    transform 180ms ease,
-    visibility 180ms;
+    opacity 0ms ease,
+    transform 350ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 350ms;
 }
 
 .search-sticky-wrap--visible {
   transform: translateX(-50%) translateY(0) scale(1);
   opacity: 1;
-  pointer-events: auto;
   visibility: visible;
+  pointer-events: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1201,7 +1201,7 @@ footer p {
   background: transparent;
   width: 100%;
   font-size: 14px;
-  color: var(--ink, #17445e);
+  color: var(--ink, #f0f3f4);
 }
 
 .search-pill-clear {
@@ -1269,5 +1269,101 @@ footer p {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+
+.export-excel-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 24px;
+  margin: 24px auto 0;
+  padding: 14px 18px;
+  border: 1px solid #198754;
+  border-radius: 30px;
+  background: #198754;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.export-excel-button:hover {
+  background: #146c43;
+  border-color: #146c43;
+}
+
+.export-excel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.directory-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.directory-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.directory-title h2 {
+  margin-bottom: 0;
+}
+
+.export-excel-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: auto;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 18px;
+
+  border: 1px solid #198754;
+  border-radius: 30px;
+  background: #198754;
+  color: #ffffff;
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.export-excel-button:hover {
+  background: #146c43;
+  border-color: #146c43;
+}
+
+.export-excel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .directory-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .export-excel-button {
+    width: 100%;
   }
 }

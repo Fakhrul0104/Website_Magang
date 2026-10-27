@@ -13,6 +13,7 @@ import Icon from "../components/Icon";
 import LinkVisual from "../components/LinkVisual";
 import type { LinkItem } from "../types/link";
 import Pelabuhan from "../assets/dji.webp";
+import { exportLinksToExcel } from "../utils/exportLinksToExcel";
 
 type HomePageProps = {
   links: LinkItem[];
@@ -285,18 +286,30 @@ export default function HomePage({
           ref={headingRef}
           style={{ scrollMarginTop: `${SCROLL_MARGIN_TOP}px` }}
         >
-          <div>
-            <span className="section-kicker">
-              {isSearching
-                ? "HASIL PENCARIAN"
-                : "DIREKTORI DIGITAL"}
-            </span>
+          <div className="directory-heading">
+            <div className="directory-title">
+              <span className="section-kicker">
+                {isSearching
+                  ? "HASIL PENCARIAN"
+                  : "DIREKTORI DIGITAL"}
+              </span>
 
-            <h2>
-              {isSearching
-                ? `Menampilkan ${visibleLinks.length} Hasil`
-                : "Portal Layanan"}
-            </h2>
+              <h2>
+                {isSearching
+                  ? `Menampilkan ${visibleLinks.length} Hasil`
+                  : "Portal Layanan"}
+              </h2>
+            </div>
+
+            <button
+              className="export-excel-button"
+              onClick={() => exportLinksToExcel(links)}
+              type="button"
+              disabled={links.length === 0}
+            >
+              <Icon name="file-spreadsheet" size={20} />
+              Unduh Direktori ke Excel
+            </button>
           </div>
         </div>
 
@@ -372,3 +385,4 @@ export default function HomePage({
     </main>
   );
 }
+
