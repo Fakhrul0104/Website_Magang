@@ -413,25 +413,21 @@ export default function ManagePage({
                                 dalam direktori.
                             </p>
                         </div>
-
-                        <span className="count-badge">
-                            {links.length}
-                        </span>
                     </div>
 
                     <div className="manage-list">
                         {links.map((link) => (
                             <div
                                 className={`manage-item${editingId === link.id
-                                        ? " is-editing"
-                                        : ""
+                                    ? " is-editing"
+                                    : ""
                                     }`}
                                 key={link.id}
                             >
                                 <span
                                     className={`item-icon${link.image
-                                            ? " has-image"
-                                            : ""
+                                        ? " has-image"
+                                        : ""
                                         }`}
                                 >
                                     {link.image ? (

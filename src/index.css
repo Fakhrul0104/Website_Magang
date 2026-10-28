@@ -155,7 +155,7 @@ nav button.active::after {
 }
 
 .hero {
-  height: 490px;
+  height: 450px;
   position: relative;
   overflow: hidden;
   color: white;
@@ -178,7 +178,7 @@ nav button.active::after {
 .hero-content {
   position: absolute;
   left: clamp(24px, 9vw, 140px);
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   max-width: 620px;
 }
@@ -271,7 +271,7 @@ nav button.active::after {
 .portal-section {
   max-width: 1380px;
   margin: 0 auto;
-  padding: 50px 28px 96px;
+  padding: 40px 28px 96px;
 }
 
 .section-heading {
@@ -291,9 +291,8 @@ nav button.active::after {
 
 .section-heading h2,
 .panel-title h2 {
-  font: 600 65px/1 "Cormorant Garamond", serif;
+  font: 600 50px/1 "Cormorant Garamond", serif;
   color: var(--navy);
-  margin: 5px 0 0;
 }
 
 .section-heading>p {
@@ -952,6 +951,26 @@ footer p {
 }
 
 @media (max-width: 580px) {
+  .panel-title h2 {
+    font-size: 30px;
+  }
+
+  .hero {
+    height: 400px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+  }
+
+  .section-kicker {
+    font-size: 12px;
+  }
+
+  .hero-content>p {
+    font-size: 17px;
+  }
+
   .site-header {
     height: 70px;
     padding: 0 18px;
@@ -978,16 +997,12 @@ footer p {
     font-size: 9px;
   }
 
-  .hero {
-    height: 480px;
-  }
-
   .hero-content {
     left: 24px;
   }
 
   .hero h1 {
-    font-size: 52px;
+    font-size: 48px;
   }
 
   .coordinates {
@@ -1222,7 +1237,7 @@ footer p {
 /* Posisi Anchor di Hero */
 .hero-search-anchor {
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 32px);
@@ -1278,10 +1293,9 @@ footer p {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
-  margin-top: 24px;
-  margin: 24px auto 0;
-  padding: 14px 18px;
+  width: auto;
+  margin: 0;
+  padding: 12px 18px;
   border: 1px solid #198754;
   border-radius: 30px;
   background: #198754;
@@ -1319,41 +1333,6 @@ footer p {
 
 .directory-title h2 {
   margin-bottom: 0;
-}
-
-.export-excel-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  width: auto;
-  flex-shrink: 0;
-  margin: 0;
-  padding: 12px 18px;
-
-  border: 1px solid #198754;
-  border-radius: 30px;
-  background: #198754;
-  color: #ffffff;
-
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.export-excel-button:hover {
-  background: #146c43;
-  border-color: #146c43;
-}
-
-.export-excel-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 @media (max-width: 600px) {
