@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors";
 import compression from "compression";
 import dotenv from "dotenv";
-import { randomUUID } from "node:crypto";
 import db from "./db.js";
 
 dotenv.config();
@@ -209,15 +208,13 @@ app.post("/api/links", async (req, res) => {
       throw new Error("Kategori tidak ditemukan.");
     }
 
-    const id = randomUUID();
     const cleanDescription = description?.trim() ?? "";
 
-    await connection.execute(
+    const [insertResult] = await connection.execute(
       `INSERT INTO links
-        (id, category_id, title, description, url, icon, image)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        (category_id, title, description, url, icon, image)
+      VALUES (?, ?, ?, ?, ?, ?)`,
       [
-        id,
         categories[0].id,
         title.trim(),
         cleanDescription,
@@ -226,6 +223,8 @@ app.post("/api/links", async (req, res) => {
         image || null,
       ]
     );
+
+    const id = insertResult.insertId;
 
     await connection.commit();
     invalidateLinksCache();
