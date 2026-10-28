@@ -1346,3 +1346,72 @@ footer p {
     width: 100%;
   }
 }
+
+/* Perbaikan lebar halaman pada perangkat mobile */
+html,
+body,
+#root,
+.app-shell {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 580px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .app-shell,
+  .manage-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Header mengikuti lebar layar HP */
+  .site-header {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    gap: 8px;
+  }
+
+  .brand {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .brand img {
+    max-width: 100%;
+  }
+
+  nav {
+    min-width: 0;
+    flex-shrink: 0;
+    gap: 10px;
+  }
+
+  nav button {
+    white-space: nowrap;
+  }
+
+  /* Kontainer formulir tidak melewati layar */
+  .manage-layout {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .form-panel,
+  .list-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
