@@ -10,6 +10,8 @@ type Page = "home" | "manage";
 
 const API_URL = "http://10.101.25.50:3000/api/links";
 
+/*const API_URL = import.meta.env.VITE_API_URL; (Untuk digunakan di computer lain)*/
+
 export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [notice, setNotice] = useState("");
