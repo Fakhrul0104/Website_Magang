@@ -14,6 +14,7 @@ import LinkVisual from "../components/LinkVisual";
 import type { LinkItem } from "../types/link";
 import Pelabuhan from "../assets/dji.webp";
 import { exportLinksToExcel } from "../utils/exportLinksToExcel";
+import { categories } from "../data/links";
 
 type HomePageProps = {
   links: LinkItem[];
@@ -106,6 +107,10 @@ export default function HomePage({
   const [query, setQuery] = useState("");
   const [isSticky, setIsSticky] = useState(false);
 
+  // State filter kategori harus berada di dalam komponen.
+  const [selectedCategory, setSelectedCategory] =
+    useState("Semua");
+
   const anchorRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const stickyInputRef = useRef<HTMLInputElement>(null);
@@ -114,24 +119,28 @@ export default function HomePage({
   const normalizedQuery = query.trim().toLowerCase();
   const isSearching = normalizedQuery.length > 0;
 
+  // Pencarian dan filter kategori berjalan bersamaan.
+  const visibleLinks = useMemo(() => {
+    return links.filter((link) => {
+      const matchesCategory =
+        selectedCategory === "Semua" ||
+        link.category === selectedCategory;
+
+      const matchesSearch =
+        `${link.title} ${link.description} ${link.category}`
+          .toLowerCase()
+          .includes(normalizedQuery);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [links, selectedCategory, normalizedQuery]);
+
   const handleSearchChange = useCallback((value: string) => {
     setQuery(value);
   }, []);
 
-  // Filter tautan berdasarkan judul, deskripsi, dan kategori.
-  const visibleLinks = useMemo(() => {
-    if (!normalizedQuery) {
-      return links;
-    }
-
-    return links.filter((link) =>
-      `${link.title} ${link.description} ${link.category}`
-        .toLowerCase()
-        .includes(normalizedQuery),
-    );
-  }, [links, normalizedQuery]);
-
   // Pengelompokan hanya digunakan saat pencarian kosong.
+  // Filter kategori tetap diterapkan.
   const groupedLinks = useMemo(() => {
     if (isSearching) {
       return [];
@@ -139,7 +148,7 @@ export default function HomePage({
 
     const groups = new Map<string, LinkItem[]>();
 
-    for (const link of links) {
+    for (const link of visibleLinks) {
       const existing = groups.get(link.category);
 
       if (existing) {
@@ -150,7 +159,7 @@ export default function HomePage({
     }
 
     return Array.from(groups.entries());
-  }, [links, isSearching]);
+  }, [visibleLinks, isSearching]);
 
   // Mengatur kemunculan sticky search bar.
   useEffect(() => {
@@ -167,7 +176,7 @@ export default function HomePage({
         HEADER_HEIGHT - STICKY_TRIGGER_OFFSET;
 
       setIsSticky((previous) =>
-        previous === shouldBeSticky ? previous : shouldBeSticky,
+        previous === shouldBeSticky ? previous : shouldBeSticky
       );
     };
 
@@ -216,9 +225,8 @@ export default function HomePage({
     <main>
       {/* Sticky search bar */}
       <div
-        className={`search-sticky-wrap${
-          isSticky ? " search-sticky-wrap--visible" : ""
-        }`}
+        className={`search-sticky-wrap${isSticky ? " search-sticky-wrap--visible" : ""
+          }`}
         aria-hidden={!isSticky}
       >
         <SearchInput
@@ -263,9 +271,8 @@ export default function HomePage({
         {/* Pencarian utama */}
         <div className="hero-search-anchor" ref={anchorRef}>
           <div
-            className={`hero-search${
-              isSticky ? " hero-search--lifting" : ""
-            }`}
+            className={`hero-search${isSticky ? " hero-search--lifting" : ""
+              }`}
           >
             <SearchInput
               value={query}
@@ -307,12 +314,36 @@ export default function HomePage({
               type="button"
               disabled={links.length === 0}
             >
-              <Icon name="file-spreadsheet" size={20} />
+              <Icon name="file-spreadsheet" size={18} />
               Unduh Direktori ke Excel
             </button>
           </div>
         </div>
+        {/* Filter kategori */}
+        <div className="category-filter">
+          <button
+            type="button"
+            className={`category-filter-button ${selectedCategory === "Semua" ? "active" : ""
+              }`}
+            onClick={() => setSelectedCategory("Semua")}
+            aria-pressed={selectedCategory === "Semua"}
+          >
+            Semua
+          </button>
 
+          {categories.map((category) => (
+            <button
+              key={category}
+              type="button"
+              className={`category-filter-button ${selectedCategory === category ? "active" : ""
+                }`}
+              onClick={() => setSelectedCategory(category)}
+              aria-pressed={selectedCategory === category}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
         {/* Hasil pencarian */}
         {isSearching && visibleLinks.length > 0 && (
           <div className="search-results-block">
@@ -355,15 +386,18 @@ export default function HomePage({
           ))}
 
         {/* Hasil kosong */}
-        {isSearching && visibleLinks.length === 0 && (
+        {visibleLinks.length === 0 && (
           <div className="empty-state">
             <Icon name="compass" size={34} />
 
-            <h3>Tidak ada tautan yang ditemukan</h3>
+            <h3>
+              {isSearching
+                ? "Tidak ada tautan yang ditemukan"
+                : "Belum ada tautan dalam kategori ini"}
+            </h3>
 
             <p>
-              Coba gunakan kata kunci lain atau tambahkan
-              tautan baru.
+              Coba gunakan kata kunci atau kategori lain.
             </p>
           </div>
         )}
@@ -385,4 +419,3 @@ export default function HomePage({
     </main>
   );
 }
-
