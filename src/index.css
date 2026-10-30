@@ -85,7 +85,7 @@ button {
 }
 
 .site-header {
-  height: 82px;
+  height: 62px;
   padding: 0 clamp(24px, 5vw, 78px);
   display: flex;
   align-items: center;
@@ -165,7 +165,7 @@ nav button.active::after {
 
 /* HERO: banner utama dengan gambar latar dan teks pengantar. */
 .hero {
-  height: 450px;
+  height: 400px;
   position: relative;
   overflow: hidden;
   color: white;
@@ -187,7 +187,7 @@ nav button.active::after {
 
 .hero-content {
   position: absolute;
-  left: clamp(24px, 9vw, 140px);
+  left: clamp(24px, 7vw, 100px);
   top: 40%;
   transform: translateY(-50%);
   max-width: 620px;
@@ -195,8 +195,8 @@ nav button.active::after {
 
 .eyebrow {
   color: #bdeeff;
-  font-size: 13px;
-  letter-spacing: .3em;
+  font-size: 11px;
+  letter-spacing: .2em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -204,7 +204,7 @@ nav button.active::after {
 }
 
 .eyebrow span {
-  width: 32px;
+  width: 30px;
   height: 1px;
   background: var(--brass);
 }
@@ -212,7 +212,7 @@ nav button.active::after {
 .hero h1,
 .manage-intro h1 {
   font-family: "Cormorant Garamond", serif;
-  font-size: clamp(54px, 6vw, 78px);
+  font-size: clamp(40px, 6vw, 60px);
   line-height: .9;
   font-weight: 600;
   letter-spacing: -.035em;
@@ -226,10 +226,10 @@ nav button.active::after {
 }
 
 .hero-content>p {
-  margin: 0 0 28px;
+  margin: 0 0 18px;
   color: #cfddda;
   font-family: "Cormorant Garamond", serif;
-  font-size: 20px;
+  font-size: 17px;
 }
 
 
@@ -297,15 +297,15 @@ nav button.active::after {
 }
 
 .section-kicker {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--brass);
-  letter-spacing: .25em;
+  letter-spacing: .12em;
   font-weight: 600;
 }
 
 .section-heading h2,
 .panel-title h2 {
-  font: 600 50px/1 "Cormorant Garamond", serif;
+  font: 600 35px/1 "Cormorant Garamond", serif;
   color: var(--navy);
 }
 
@@ -551,13 +551,13 @@ nav button.active::after {
 }
 
 .manage-intro h1 {
-  font-size: clamp(50px, 6vw, 68px);
+  font-size: clamp(40px, 6vw, 42px);
   margin: 14px 0;
 }
 
 .manage-intro>p {
   color: #aebfbd;
-  font: 17px "Cormorant Garamond", serif;
+  font: 16px "Cormorant Garamond", serif;
   margin: 0;
   max-width: 530px;
 }
@@ -566,7 +566,7 @@ nav button.active::after {
 /* LAYOUT KELOLA: mengatur posisi panel formulir dan daftar tautan. */
 .manage-layout {
   max-width: 1320px;
-  margin: -56px auto 0;
+  margin: -30px auto 0;
   padding: 0 28px;
   position: relative;
   display: grid;
@@ -612,12 +612,12 @@ nav button.active::after {
 }
 
 .panel-title h2 {
-  font-size: 36px;
+  font-size: 24px;
   margin: 0;
 }
 
 .panel-title p {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--muted);
   margin: 7px 0 0;
 }
@@ -635,10 +635,10 @@ form {
 form label>span {
   display: block;
   text-transform: uppercase;
-  letter-spacing: .13em;
+  letter-spacing: .10em;
   color: #526e70;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
@@ -678,10 +678,10 @@ form input::placeholder {
   align-items: center;
   justify-content: space-between;
   text-transform: uppercase;
-  letter-spacing: .13em;
+  letter-spacing: .10em;
   color: #526e70;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
@@ -1430,6 +1430,7 @@ body,
 }
 
 @media (max-width: 580px) {
+
   html,
   body {
     overflow-x: hidden;

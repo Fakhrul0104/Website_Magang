@@ -181,7 +181,7 @@ export default function ManagePage({
                 </span>
 
                 <h1>
-                    Kelola <em>Tautan</em>
+                    Kelola Tautan
                 </h1>
 
                 <p>
